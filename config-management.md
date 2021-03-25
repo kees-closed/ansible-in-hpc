@@ -2,7 +2,7 @@
 title: Config management tool review for HPC
 #subject:
 #description:
-date: \today
+date: December 7, 2020
 lang: en-US
 papersize: a4
 geometry: margin=2cm
@@ -25,7 +25,7 @@ keywords:
   - HPC
   - Configuration management
 abstract: |
-  This report was written in mid-2020 to briefly summarize Ansible when applied to HPC cluster deployments and compares it to some aspects of Salt, CFEngine and Puppet. The greatest concerns of Ansible is that it scales linearly, which as a result creates a bottleneck when going beyond 200 nodes in a regular setup. This bottleneck is mainly due to the strength of Ansible, it uses no agents. Using Ansible in pull mode would alleviate that weakness.
+  This report was written in late-2020 to briefly summarize Ansible when applied to HPC cluster deployments and compares it to some aspects of Salt, CFEngine and Puppet. The greatest concerns of Ansible is that it scales linearly, which as a result creates a bottleneck when going beyond 200 nodes in a regular setup. This bottleneck is mainly due to the strength of Ansible, it uses no agents. Using Ansible in pull mode would alleviate that weakness.
 ---
 
 
