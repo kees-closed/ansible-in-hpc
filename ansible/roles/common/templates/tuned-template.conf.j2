@@ -1,0 +1,41 @@
+# {{ ansible_managed }}
+[main]
+summary={{ item.summary }}
+{% if item.include is defined %}
+include={{ item.include }}
+{% endif %}
+
+[bootloader]
+{% if not ansible_architecture.startswith('arm') %}
+cmdline=pcie_aspm=force
+{% endif %}
+
+{% if sysctl is defined %}
+[sysctl]
+{{ sysctl }}
+
+{% endif %}
+[disk]
+devices=!{{ ansible_devices.keys() | join(',!') }}
+
+{% for item in query('dict', ansible_devices) if item.value.removable == "0" and (item.value.model != None or item.key.startswith('mmc')) %}
+{% if item.value.rotational == "0" %}
+[disk_{{ item.key }}]
+type=disk
+devices={{ item.key }}
+{% if item.key.startswith('nvme') %}
+elevator=none
+{% elif item.key.startswith('mmc') %}
+elevator=mq-deadline
+{% else %}
+elevator=noop
+{% endif %}
+
+{% else %}
+[disk_{{ item.key }}]
+type=disk
+devices={{ item.key }}
+elevator=cfq
+
+{% endif %}
+{% endfor %}

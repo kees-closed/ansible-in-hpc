@@ -1,0 +1,109 @@
+---
+- name: create custom tuned profile directory
+  file:
+    path: /opt/ansible/etc/tuned/custom-{{ item }}/
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  loop:
+    - balanced
+    - powersave
+
+- name: copy custom tuned profiles
+  template:
+    src: tuned-template.conf.j2
+    dest: /opt/ansible/etc/tuned/custom-{{ item.dest }}/tuned.conf
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - dest: balanced
+      summary: Customized balanced-power usage profile
+      include: balanced
+    - dest: powersave
+      summary: Customized low-power usage profile
+      include: powersave
+  loop_control:
+    label: "{{ item.dest }}"
+
+- name: copy motd
+  template:
+    src: "{{ item }}.j2"
+    dest: /opt/ansible/etc/{{ item }}
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - motd
+    - issue.net
+
+- name: copy rpmmacro config
+  template:
+    src: rpmmacros.j2
+    dest: /opt/ansible/.rpmmacros_{{ item.name }}
+    owner: root
+    group: root
+    mode: "0664"
+  loop:
+    - name: johnd
+      comment: just a test
+    - name: janed
+      comment: also just a test
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: create wkd directory
+  file:
+    path: /opt/ansible/var/www/{{ item }}/
+    state: directory
+    owner: root
+    group: root 
+    mode: "0755"
+  loop:
+    - .well-known/acme-challenge/
+    - .well-known/openpgpkey/hu/
+
+- name: copy wkd files
+  copy:
+    src: "{{ item }}"
+    dest: /opt/ansible/var/www/
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - file1
+    - file2
+    - file3
+    - file4
+    - file5
+    - file6
+    - file7
+    - file8
+    - file9
+    - file10
+
+- name: copy wkd apache config
+  template:
+    src: wkd.conf.j2
+    dest: /opt/ansible/etc/{{ item.dest }}
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - dest: 001-test.conf
+      domain: test.nl
+    - dest: 002-test.conf
+      domain: test.com
+    - dest: 003-test.conf
+      domain: test.abc
+    - dest: 004-test.conf
+      domain: test.net
+  loop_control:
+    label: "{{ item.dest }}"
+
+- name: cleanup ansible tree
+  file:
+    path: /opt/ansible/
+    state: absent
+  tags: cleanup

@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+<VirtualHost _default_:80>
+  ServerName {{ item.domain }}
+  RedirectMatch permanent ^/(.*)$ https://{{ item.domain }}/$1
+</VirtualHost>
+<IfModule mod_ssl.c>
+  <VirtualHost _default_:443>
+    ServerAdmin 
+    ServerName {{ item.domain }}
+    DocumentRoot /var/www/{{ item.domain }}
+    LogLevel alert
+    CustomLog ${APACHE_LOG_DIR}/{{ item.domain }}_access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/{{ item.domain }}_error.log
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ item.domain }}/privkey.pem
+    <Directory /var/www/{{ item.domain }}>
+      Require all granted
+      Options -Indexes -ExecCGI -FollowSymlinks -SymLinksIfOwnerMatch
+      AllowOverride Indexes
+      <IfModule mod_headers.c>
+        Header always append X-Frame-Options SAMEORIGIN
+        Header always set Content-Security-Policy "base-uri 'self'; default-src 'none'; form-action 'self'; frame-ancestors 'none'; img-src 'self'; object-src 'none'; style-src 'self';"
+        Header always set Referrer-Policy "no-referrer"
+        Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+        Header always set X-Content-Type-Options nosniff
+        Header set X-XSS-Protection "1; mode=block"
+        Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
+      </IfModule>
+    </Directory>
+  </VirtualHost>
+</IfModule>

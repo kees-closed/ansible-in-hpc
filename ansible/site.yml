@@ -1,0 +1,8 @@
+---
+- hosts: haswell
+  serial:
+    - 200
+    - 400
+    - 50%
+  roles:
+    - common

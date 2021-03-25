@@ -1,0 +1,10 @@
+user:
+  - name: kjong
+    state: true
+    uid: 1000
+  - name: pi
+    state: false
+    uid: 1001
+  - name: root
+    state: true
+    uid: 0
